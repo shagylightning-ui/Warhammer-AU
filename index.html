@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0e0f13"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Gallery">
+<link rel="apple-touch-icon" href="icons/icon-180.png"><link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="style.css"><title>Gallery</title></head><body>
+<header id="bar"><button id="back" class="ib" hidden>‹</button><h1 id="title">Gallery</h1>
+<div class="acts"><button id="searchBtn" class="ib" title="Search">⌕</button><button id="sizeBtn" class="ib" title="Grid size">▦</button><button id="selBtn" class="ib" hidden>Select</button><button id="menuBtn" class="ib">⋯</button></div></header>
+<div id="searchRow" hidden><input id="q" type="search" placeholder="Search captions / prompts"></div>
+<main id="main"></main>
+<div id="fab"><button id="addFolder">＋ Folder</button><label id="addImgs" hidden>＋ Images<input id="file" type="file" accept="image/*" multiple hidden></label></div>
+<div id="selBar" hidden><span id="selCount">0</span><button data-a="move">Move</button><button data-a="copy">Copy</button><button data-a="del" class="danger">Delete</button><button data-a="cancel">Done</button></div>
+<div id="viewer" hidden><div id="vtrack"></div><div id="vtop"><button id="vclose" class="ib">✕</button><span id="vidx"></span><span></span></div>
+<div id="vbot"><textarea id="vcap" rows="2" placeholder="Caption / prompt…"></textarea><div class="row"><button id="vshare">Share</button><button id="vdl">Save</button><button id="vdel" class="danger">Delete</button></div></div></div>
+<div id="sheet" hidden><div class="sh"><div id="shBody"></div><button id="shCancel">Cancel</button></div></div>
+<div id="toast" hidden></div>
+<script src="app.js"></script></body></html>
