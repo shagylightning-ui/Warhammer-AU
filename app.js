@@ -4,7 +4,7 @@ let db;
 const openDB=()=>new Promise((res,rej)=>{const r=indexedDB.open('gallery',1);
  r.onupgradeneeded=()=>{const d=r.result;d.createObjectStore('folders',{keyPath:'id'});const im=d.createObjectStore('images',{keyPath:'id'});im.createIndex('folder','folder');d.createObjectStore('blobs');d.createObjectStore('thumbs')};
  r.onsuccess=()=>res(db=r.result);r.onerror=()=>rej(r.error)});
-const tx=(s,m='readonly')=>db.transaction(s,m);
+const tx=(s,m='readonly')=>{if(!db)throw new Error('Storage is not ready. Reload the page in regular Safari.');return db.transaction(s,m)};
 const P=r=>new Promise((a,b)=>{r.onsuccess=()=>a(r.result);r.onerror=()=>b(r.error)});
 const all=s=>P(tx(s).objectStore(s).getAll());
 const get=(s,k)=>P(tx(s).objectStore(s).get(k));
@@ -29,9 +29,8 @@ async function makeThumb(blob,size=400){
  c.getContext('2d').drawImage(src,(w-s)/2,(h-s)/2,s,s,0,0,size,size);
  return new Promise(a=>c.toBlob(a,'image/jpeg',.8))}
 function sheet(html,bind){$('#shBody').innerHTML=html;$('#sheet').hidden=false;return new Promise(res=>{const done=v=>{$('#sheet').hidden=true;res(v)};
- $('#shCancel').onclick=()=>done(null);$('#sheet').onclick=e=>{if(e.target.id==='sheet')done(null)};bind&&bind(done)})}
-function ask(title,val=''){return sheet(`<h3>${esc(title)}</h3><input id="shIn" value="${esc(val)}"><button id="shOk" style="text-align:center;background:var(--a);color:#0b0d14;font-weight:700">OK</button>`,done=>{
- const i=$('#shIn');setTimeout(()=>i.focus(),50);const ok=()=>done(i.value.trim()||null);$('#shOk').onclick=ok;i.onkeydown=e=>e.key==='Enter'&&ok()})}
+ $('#shCancel').onclick=()=>done(null);bind&&bind(done)})}
+function ask(title,val=''){return new Promise(res=>setTimeout(()=>{const v=window.prompt(title,val);res(v&&v.trim()?v.trim():null)},0))}
 function menu(title,items){return sheet(`<h3>${esc(title)}</h3>`+items.map((it,i)=>`<button data-i="${i}" class="${it.danger?'danger':''}">${esc(it.label)}</button>`).join(''),done=>{
  $('#shBody').querySelectorAll('button[data-i]').forEach(b=>b.onclick=()=>done(items[b.dataset.i].v))})}
 
@@ -180,5 +179,8 @@ async function importZip(f){try{toast('Importing…');const z=await readZip(f),m
   toast(`Imported ${n} image(s)`);render()}catch(e){alert('Import failed: '+e.message)}}
 window.__importZip=importZip;
 
-openDB().then(render);
+window.addEventListener('unhandledrejection',e=>alert('Something went wrong: '+((e.reason&&(e.reason.message||e.reason.name))||e.reason)));
+window.addEventListener('error',e=>alert('Error: '+e.message));
+if(!window.indexedDB){alert('This browser has storage turned off. Open the site in regular Safari (not Private Browsing or an in-app browser).')}
+else openDB().then(render).catch(e=>alert('Could not open storage: '+(e&&(e.message||e.name))+'. Open the site in regular Safari, not Private Browsing or an in-app browser.'));
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
